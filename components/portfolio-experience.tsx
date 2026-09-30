@@ -1,256 +1,461 @@
 "use client";
 
-import Lenis from "lenis";
 import {
+  ArrowDown,
   ArrowUpRight,
   Download,
   Github,
-  Linkedin,
   Mail,
-  Send,
-  Shield,
+  Menu,
+  X,
+  Radar,
   ShieldCheck,
-  Trophy
+  Code2,
+  Trophy,
 } from "lucide-react";
-import { motion } from "framer-motion";
-import { CSSProperties, FormEvent, useEffect, useState } from "react";
+import { useState } from "react";
+import type { IconType } from "react-icons";
+import {
+  SiPython,
+  SiOpenjdk,
+  SiCplusplus,
+  SiTypescript,
+  SiJavascript,
+  SiReact,
+  SiNextdotjs,
+  SiNodedotjs,
+  SiOwasp,
+  SiBurpsuite,
+  SiWireshark,
+  SiLinux,
+  SiSupabase,
+  SiFirebase,
+  SiMetasploit,
+} from "react-icons/si";
 import { achievements, projects, skillNodes } from "@/lib/portfolio-data";
 
-const githubUrl = "https://github.com/AdolfBharath";
-const jenovateUrl = "https://jenovate.in";
-const email = "levictf24@gmail.com";
-const assetBase = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-const heroImagePath = `${assetBase}/images/spider-cyber-hero.png`;
-const resumePath = `${assetBase}/resume.pdf`;
-
-const navItems = ["about", "experience", "projects", "live", "skills", "contact"];
-
-function SectionTitle({ kicker, title, copy }: { kicker: string; title: string; copy?: string }) {
-  return (
-    <motion.div
-      className="section-title"
-      initial={{ opacity: 0, y: 18 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.45 }}
-    >
-      <span>{kicker}</span>
-      <h2>{title}</h2>
-      {copy ? <p>{copy}</p> : null}
-    </motion.div>
-  );
-}
+const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+const github = "https://github.com/AdolfBharath";
+const toolLogos: Record<string, { icon: IconType; color: string }> = {
+  Python: { icon: SiPython, color: "#76b9eb" },
+  Java: { icon: SiOpenjdk, color: "#ff9273" },
+  "C++": { icon: SiCplusplus, color: "#83bfff" },
+  TypeScript: { icon: SiTypescript, color: "#78b8ff" },
+  JavaScript: { icon: SiJavascript, color: "#f7df1e" },
+  React: { icon: SiReact, color: "#61dafb" },
+  "Next.js": { icon: SiNextdotjs, color: "#ffffff" },
+  "Node.js": { icon: SiNodedotjs, color: "#8ed875" },
+  OWASP: { icon: SiOwasp, color: "#ffffff" },
+  "Burp Suite": { icon: SiBurpsuite, color: "#ff956f" },
+  Wireshark: { icon: SiWireshark, color: "#79bdff" },
+  Linux: { icon: SiLinux, color: "#f6d661" },
+  Supabase: { icon: SiSupabase, color: "#3ecf8e" },
+  Firebase: { icon: SiFirebase, color: "#ffca28" },
+  Metasploit: { icon: SiMetasploit, color: "#80b9ee" },
+};
+const filters = ["All work", "Security", "Development"] as const;
+const securityProjects = new Set([
+  "Insider Threat Detection",
+  "MongoBleed Lab",
+  "DeepFake Detection",
+  "Linux Luminarium",
+]);
 
 export default function PortfolioExperience() {
-  const [sent, setSent] = useState(false);
-
-  useEffect(() => {
-    const lenis = new Lenis({ lerp: 0.09, smoothWheel: true });
-    let frame = 0;
-    const raf = (time: number) => {
-      lenis.raf(time);
-      frame = requestAnimationFrame(raf);
-    };
-    frame = requestAnimationFrame(raf);
-    return () => cancelAnimationFrame(frame);
-  }, []);
-
-  const submitContact = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const name = String(data.get("name") ?? "");
-    const sender = String(data.get("email") ?? "");
-    const message = String(data.get("message") ?? "");
-    const subject = encodeURIComponent(`Portfolio contact from ${name || "visitor"}`);
-    const body = encodeURIComponent(`Name: ${name}\nEmail: ${sender}\n\n${message}`);
-    setSent(true);
-    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
-    window.setTimeout(() => setSent(false), 2200);
-  };
-
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [filter, setFilter] = useState<(typeof filters)[number]>("All work");
+  const visibleProjects = projects.filter(
+    (project) =>
+      filter === "All work" ||
+      (filter === "Security"
+        ? securityProjects.has(project.title)
+        : !securityProjects.has(project.title)),
+  );
   return (
-    <main className="site" style={{ "--hero-image": `url("${heroImagePath}")` } as CSSProperties}>
-      <nav className="nav-shell">
-        <a className="brand" href="#home">
-          <span className="brand-mark">BM</span>
-          <span>Bharath Murugan</span>
+    <main id="home">
+      <a href="#projects" className="skip-link">
+        Skip to projects
+      </a>
+      <header className="header">
+        <a className="brand" href="#home" aria-label="Bharath Murugan home">
+          BM<span>.</span>
+          <small>
+            BHARATH
+            <br />
+            MURUGAN
+          </small>
         </a>
-        <div>
-          {navItems.map((item) => (
-            <a href={`#${item}`} key={item}>{item}</a>
-          ))}
-        </div>
-      </nav>
-
-      <section id="home" className="hero">
-        <div className="hero-image" aria-hidden>
+        <button
+          className="menu-toggle icon-button"
+          aria-label={menuOpen ? "Close navigation" : "Open navigation"}
+          aria-expanded={menuOpen}
+          aria-controls="navigation"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          {menuOpen ? <X /> : <Menu />}
+        </button>
+        <nav
+          id="navigation"
+          className={menuOpen ? "navigation open" : "navigation"}
+          aria-label="Main navigation"
+        >
+          {["about", "projects", "experience", "skills", "contact"].map(
+            (item) => (
+              <a
+                key={item}
+                href={`#${item}`}
+                onClick={() => setMenuOpen(false)}
+              >
+                {item}
+              </a>
+            ),
+          )}
+          <a className="nav-resume" href={`${base}/resume.pdf`} download>
+            Resume <Download size={14} />
+          </a>
+        </nav>
+      </header>
+      <aside className="swing-widget" aria-hidden="true">
+        <div className="swing-figure">
+          <span className="web-thread" />
           <img
-            src={heroImagePath}
+            src={`${base}/images/spider-swing.png`}
             alt=""
-            className="hero-photo"
+            width="900"
+            height="1196"
           />
-          <div className="hero-webline hero-webline-one" />
-          <div className="hero-webline hero-webline-two" />
-          <div className="hero-shade" />
         </div>
-        <motion.div className="hero-content" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-          <div className="hero-status">
-            <span><Shield size={15} /> Security portfolio online</span>
-            <span>Resume ready</span>
+      </aside>
+      <section className="hero" aria-labelledby="hero-title">
+        <div className="hero-art" aria-hidden="true">
+          <img
+            src={`${base}/images/spider-hero.png`}
+            alt=""
+            width="734"
+            height="692"
+            fetchPriority="high"
+          />
+        </div>
+        <div className="hero-inner">
+          <div className="issue-label">
+            <span>THE PORTFOLIO OF</span>
+            <span>VOL. 01 / 2026</span>
           </div>
-          <span className="eyebrow">Cyber Security / Full Stack / Ethical Hacking</span>
-          <h1>Bharath Murugan</h1>
-          <p>
-            I build secure digital experiences with the discipline of a security engineer and the craft of a full stack developer.
+          <p className="hero-kicker">Your friendly neighborhood developer.</p>
+          <h1 id="hero-title">
+            BHARATH
+            <br />
+            <span>MURUGAN</span>
+            <b>.</b>
+          </h1>
+          <p className="hero-description">
+            Building for the web.
+            <br />
+            Thinking like a defender.
+          </p>
+          <p className="hero-copy">
+            Cyber security student. Full stack developer.
+            <br />
+            Curious about what makes things work, and what makes them break.
           </p>
           <div className="hero-actions">
-            <a className="button primary" href="#projects">View Projects <ArrowUpRight size={17} /></a>
-            <a className="button" href={resumePath} download>Resume <Download size={17} /></a>
-            <a className="button quiet" href={githubUrl}>GitHub <Github size={17} /></a>
+            <a className="button primary" href="#projects">
+              Explore my work <ArrowUpRight size={18} />
+            </a>
+            <a className="text-link" href={github}>
+              <Github size={18} /> GitHub
+            </a>
           </div>
-        </motion.div>
-      </section>
-
-      <section id="about" className="section about-section">
-        <SectionTitle
-          kicker="Profile"
-          title="A security-first developer with a cinematic edge, not a noisy gimmick."
-          copy="The portfolio now uses a Spider-inspired visual mood through image direction, red and blue contrast, web-like structure, and restrained security UI details."
-        />
-        <div className="about-grid">
-          <article className="feature-panel large">
-            <h3>Education</h3>
-            <p>BE Computer Science (Cyber Security), Sri Shakthi Institute of Engineering and Technology.</p>
-            <dl>
-              <div><dt>Timeline</dt><dd>2023-2027</dd></div>
-              <div><dt>CGPA</dt><dd>7.17</dd></div>
-            </dl>
-          </article>
-          {["Cyber Security", "Full Stack Development", "Open Source Learning"].map((item) => (
-            <article className="feature-panel" key={item}>
-              <ShieldCheck />
-              <h3>{item}</h3>
-              <p>Practical, focused, and built around real outcomes instead of decoration.</p>
-            </article>
-          ))}
+          <a className="scroll-link" href="#about">
+            <ArrowDown size={16} /> THE STORY CONTINUES
+          </a>
         </div>
+        <span className="hero-caption">
+          WITH GREAT CURIOSITY
+          <br />
+          <strong>COMES BETTER CODE.</strong>
+        </span>
       </section>
-
-      <section id="experience" className="section story-row">
-        <SectionTitle kicker="Experience" title="Jenovate internship work, presented clearly." />
-        <article className="experience-panel">
-          <div>
-            <span>Cyber Security & Full Stack Intern</span>
-            <h3>Jenovate</h3>
-          </div>
-          <ul>
-            <li>Built and refined full stack learning platform workflows.</li>
-            <li>Supported secure auth, data handling, and dashboard behavior.</li>
-            <li>Practiced security review habits across frontend and backend touchpoints.</li>
-          </ul>
-        </article>
-      </section>
-
-      <section id="projects" className="section projects-section">
-        <SectionTitle
-          kicker="Projects"
-          title="Security projects that recruiters can scan fast."
-          copy="Each card is quiet enough to read, but still carries the red-blue Spider-inspired identity."
-        />
-        <div className="project-grid">
-          {projects.map((project) => {
-            const Icon = project.icon;
-            return (
-              <motion.article
-                className="project-card"
-                key={project.title}
-                initial={{ opacity: 0, y: 18 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.35 }}
-              >
-                <div className="project-top" style={{ "--accent": project.accent } as CSSProperties}>
-                  <Icon />
-                  <span>{project.tag}</span>
-                </div>
-                <h3>{project.title}</h3>
-                <p>{project.features.join(" / ")}</p>
-                <div className="chips">{project.stack.map((tech) => <span key={tech}>{tech}</span>)}</div>
-                <div className="project-links">
-                  {project.liveHref ? <a href={project.liveHref}>Live Site <ArrowUpRight size={15} /></a> : null}
-                  <a href={project.href}>{project.liveHref ? "Source" : "Open Repo"} <ArrowUpRight size={15} /></a>
-                </div>
-              </motion.article>
-            );
-          })}
-        </div>
-      </section>
-
-      <section id="live" className="section live-section">
-        <SectionTitle
-          kicker="Live work"
-          title="Jenovate is live in production."
-          copy="A real deployed platform is stronger than another oversized source-card. This section points visitors straight to the working site."
-        />
-        <a className="live-card" href={jenovateUrl}>
-          <div>
-            <span>jenovate.in</span>
-            <strong>Open the live Jenovate platform</strong>
-          </div>
-          <ArrowUpRight />
-        </a>
-      </section>
-
-      <section id="skills" className="section skills-section">
-        <SectionTitle kicker="Skills" title="A practical toolkit, organized as a web of strengths." />
-        <div className="skill-cloud">
-          {skillNodes.map((skill) => (
-            <span key={skill.label}>{skill.label}</span>
-          ))}
-        </div>
-      </section>
-
-      <section id="github" className="section github-section">
-        <a className="github-card compact" href={githubUrl}>
-          <Github />
-          <div>
-            <span>github.com/AdolfBharath</span>
-            <strong>More source code on GitHub</strong>
-          </div>
-          <ArrowUpRight />
-        </a>
-      </section>
-
-      <section id="achievements" className="section achievements-section">
-        <SectionTitle kicker="Achievements" title="Signals beyond code." />
-        <div className="achievement-grid">
-          {achievements.map((item) => (
-            <article className="achievement-card" key={item}>
-              <Trophy />
-              <p>{item}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section id="contact" className="section contact-section">
-        <SectionTitle kicker="Contact" title="Start a conversation." copy={`Messages open your mail client to ${email}.`} />
-        <form className="contact-form" onSubmit={submitContact}>
-          <input required name="name" placeholder="Name" aria-label="Name" suppressHydrationWarning />
-          <input required name="email" type="email" placeholder="Email" aria-label="Email" suppressHydrationWarning />
-          <textarea required name="message" placeholder="Message" aria-label="Message" rows={5} suppressHydrationWarning />
-          <button className="button primary" type="submit">Send Message <Send size={17} /></button>
-          {sent ? <p className="sent-note">Opening email draft for {email}.</p> : null}
-        </form>
-      </section>
-
-      <footer className="footer">
-        <span>{"\u00a9"} 2026 Bharath Murugan</span>
+      <div className="discipline-strip">
+        <span>CYBER SECURITY</span>
+        <i>+</i>
+        <span>FULL STACK DEVELOPMENT</span>
+        <i>+</i>
+        <span>CTF & HACKATHONS</span>
+        <i>+</i>
+        <span>ALWAYS LEARNING</span>
+      </div>
+      <section id="about" className="section about">
         <div>
-          <a href={githubUrl}><Github /></a>
-          <a href="#"><Linkedin /></a>
-          <a href={`mailto:${email}`}><Mail /></a>
-          <a href="#home"><ArrowUpRight /></a>
+          <span className="eyebrow">01 / THE ORIGIN STORY</span>
+          <h2>
+            A curious mind.
+            <br />A builder at heart.
+          </h2>
+          <div className="about-focus">
+            <span>WHAT DRIVES ME</span>
+            <p>
+              <ShieldCheck size={20} /> Understanding how systems can be
+              defended.
+            </p>
+            <p>
+              <Code2 size={20} /> Turning ideas into useful web applications.
+            </p>
+            <p>
+              <Trophy size={20} /> Learning through challenges and teamwork.
+            </p>
+          </div>
+        </div>
+        <div className="about-copy">
+          <p>
+            I&apos;m Bharath, a Computer Science student specializing in Cyber
+            Security at Sri Shakthi Institute of Engineering and Technology.
+          </p>
+          <p>
+            I enjoy connecting development with security: building useful
+            applications, exploring vulnerabilities in labs, and solving
+            challenges with a team. Away from the code, you&apos;ll find me
+            participating in CTFs, hackathons, and college events.
+          </p>
+          <p>
+            My projects span full stack development, security analytics, AI, and
+            automation. From a learning management platform to threat detection
+            and OCR tools, I like working on problems that connect code with a
+            practical use.
+          </p>
+          <p>
+            CTF competitions give me a space to explore security challenges.
+            Hackathons let me put ideas into practice with a team, while
+            managing college events has given me experience in coordination and
+            teamwork beyond software.
+          </p>
+          <p>
+            I have completed certifications in full stack development,
+            networking, and cyber security. I continue building on that
+            foundation through projects, Linux practice, and hands-on security
+            labs.
+          </p>
+          <div className="education">
+            <span>B.E. COMPUTER SCIENCE / CYBER SECURITY</span>
+            <strong>
+              2023 &ndash; 2027 <span>CGPA 7.17</span>
+            </strong>
+          </div>
+        </div>
+      </section>
+      <section id="projects" className="projects-section">
+        <div className="section">
+          <div className="section-heading">
+            <div>
+              <span className="eyebrow">02 / FIELD WORK</span>
+              <h2>
+                Less talk.
+                <br />
+                <span className="red-text">More building.</span>
+              </h2>
+            </div>
+            <p>
+              Experiments, practical tools, and projects
+              <br />
+              that turn curiosity into working code.
+            </p>
+          </div>
+          <div className="project-toolbar">
+            <div className="filters" role="group" aria-label="Filter projects">
+              {filters.map((item) => (
+                <button
+                  key={item}
+                  aria-pressed={item === filter}
+                  onClick={() => setFilter(item)}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+            <span className="project-count" aria-live="polite">
+              {String(visibleProjects.length).padStart(2, "0")} PROJECTS
+            </span>
+          </div>
+          <div className="project-grid">
+            {visibleProjects.map((project) => {
+              const Icon = project.icon;
+              return (
+                <article className="project-card" key={project.title}>
+                  <div
+                    className={`project-art ${securityProjects.has(project.title) ? "security-art" : "development-art"}`}
+                  >
+                    <Icon size={64} strokeWidth={1} />
+                    <span>{project.tag}</span>
+                    <b>
+                      {String(projects.indexOf(project) + 1).padStart(2, "0")}
+                    </b>
+                  </div>
+                  <div className="project-body">
+                    <h3>{project.title}</h3>
+                    <p>{project.features.join(". ")}.</p>
+                    <div className="chips">
+                      {project.stack.map((tech) => (
+                        <span key={tech}>{tech}</span>
+                      ))}
+                    </div>
+                    <div className="project-links">
+                      <a href={project.href}>
+                        View source <ArrowUpRight size={16} />
+                      </a>
+                      {project.liveHref && (
+                        <a className="live-link" href={project.liveHref}>
+                          Live site <ArrowUpRight size={16} />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+          <a className="all-code text-link" href={github}>
+            More from my GitHub <ArrowUpRight size={17} />
+          </a>
+        </div>
+      </section>
+      <section id="experience" className="section experience">
+        <div>
+          <span className="eyebrow">03 / OUT IN THE REAL WORLD</span>
+          <h2>
+            Learning.
+            <br />
+            Building.
+            <br />
+            <span className="red-text">Shipping.</span>
+          </h2>
+        </div>
+        <div className="experience-detail">
+          <span className="role">CYBER SECURITY & FULL STACK INTERN</span>
+          <h3>
+            Jenovate<span>.</span>
+          </h3>
+          <p>
+            Hands-on experience connecting the frontend, backend, and security
+            of a learning platform.
+          </p>
+          <ul>
+            <li>Built and refined full stack learning workflows.</li>
+            <li>Worked on authentication, data handling, and dashboards.</li>
+            <li>Practiced security reviews across frontend and backend.</li>
+          </ul>
+          <a className="button dark" href="https://jenovate.in">
+            Visit Jenovate <ArrowUpRight size={17} />
+          </a>
+        </div>
+      </section>
+      <section id="skills" className="skills-section">
+        <div className="section">
+          <div className="section-heading">
+            <div>
+              <span className="eyebrow">04 / THE UTILITY BELT</span>
+              <h2>Tools of the trade.</h2>
+            </div>
+            <ShieldCheck size={42} strokeWidth={1.3} />
+          </div>
+          <div className="skills-grid">
+            {[
+              {
+                title: "Build",
+                icon: Code2,
+                groups: ["Programming", "Frontend", "Backend"],
+              },
+              {
+                title: "Defend",
+                icon: ShieldCheck,
+                groups: ["Cyber Security", "Networking"],
+              },
+              {
+                title: "Deploy & explore",
+                icon: Github,
+                groups: ["Cloud", "Tools"],
+              },
+            ].map((group) => (
+              <div className="skill-group" key={group.title}>
+                <group.icon size={23} />
+                <h3>{group.title}</h3>
+                <div className="skill-list">
+                  {skillNodes
+                    .filter((skill) => group.groups.includes(skill.group))
+                    .map((skill) => {
+                      const logo = toolLogos[skill.label];
+                      const Logo = logo?.icon ?? Radar;
+                      return (
+                        <span key={skill.label}>
+                          <Logo
+                            size={20}
+                            color={logo?.color ?? "#8fc6ff"}
+                            aria-hidden="true"
+                          />
+                          {skill.label}
+                        </span>
+                      );
+                    })}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+      <section className="section achievements" id="achievements">
+        <div>
+          <span className="eyebrow">05 / BEYOND THE KEYBOARD</span>
+          <h2>
+            Showing up.
+            <br />
+            Leveling up.
+          </h2>
+          <Trophy className="achievement-icon" size={60} strokeWidth={1} />
+        </div>
+        <ol>
+          {achievements.map((item, index) => (
+            <li key={item}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <p>{item}</p>
+              <ArrowUpRight size={17} />
+            </li>
+          ))}
+        </ol>
+      </section>
+      <section id="contact" className="contact-section">
+        <div className="section">
+          <span className="eyebrow">06 / THE NEXT CHAPTER</span>
+          <h2>
+            Got something
+            <br />
+            worth building<span>?</span>
+          </h2>
+          <div className="contact-bottom">
+            <p>
+              Let&apos;s talk projects, opportunities,
+              <br />
+              or a good security challenge.
+            </p>
+            <a href="mailto:levictf24@gmail.com">
+              levictf24@gmail.com <ArrowUpRight />
+            </a>
+          </div>
+        </div>
+      </section>
+      <footer className="footer">
+        <a className="footer-name" href="#home">
+          BHARATH MURUGAN<span>.</span>
+        </a>
+        <span>&copy; 2026 &middot; Built with curiosity.</span>
+        <div>
+          <a href={github} aria-label="Bharath on GitHub">
+            <Github size={20} />
+          </a>
+          <a href="mailto:levictf24@gmail.com" aria-label="Email Bharath">
+            <Mail size={20} />
+          </a>
+          <a href="#home" aria-label="Back to top">
+            <ArrowUpRight size={20} />
+          </a>
         </div>
       </footer>
     </main>

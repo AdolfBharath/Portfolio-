@@ -5,15 +5,16 @@ const githubPagesBasePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "/Portfolio-";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  devIndicators: false,
   output: "export",
   images: {
-    unoptimized: true
+    unoptimized: true,
   },
   basePath: isGithubPages ? githubPagesBasePath : "",
   assetPrefix: isGithubPages ? `${githubPagesBasePath}/` : undefined,
   experimental: {
-    optimizePackageImports: ["lucide-react", "framer-motion", "react-icons"]
-  }
+    optimizePackageImports: ["lucide-react", "framer-motion", "react-icons"],
+  },
 };
 
 export default nextConfig;
