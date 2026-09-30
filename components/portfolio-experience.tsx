@@ -5,6 +5,7 @@ import {
   ArrowUpRight,
   Download,
   Github,
+  Linkedin,
   Mail,
   Menu,
   X,
@@ -33,9 +34,11 @@ import {
   SiMetasploit,
 } from "react-icons/si";
 import { achievements, projects, skillNodes } from "@/lib/portfolio-data";
+import SwingingSpider from "@/components/swinging-spider";
 
 const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 const github = "https://github.com/AdolfBharath";
+const linkedin = "https://www.linkedin.com/in/bharathmurugan247";
 const toolLogos: Record<string, { icon: IconType; color: string }> = {
   Python: { icon: SiPython, color: "#76b9eb" },
   Java: { icon: SiOpenjdk, color: "#ff9273" },
@@ -115,24 +118,14 @@ export default function PortfolioExperience() {
           </a>
         </nav>
       </header>
-      <aside className="swing-widget" aria-hidden="true">
-        <div className="swing-figure">
-          <span className="web-thread" />
+      <SwingingSpider />
+      <section className="hero" aria-labelledby="hero-title">
+        <div className="hero-art" aria-hidden="true">
           <img
             src={`${base}/images/spider-swing.png`}
             alt=""
             width="900"
             height="1196"
-          />
-        </div>
-      </aside>
-      <section className="hero" aria-labelledby="hero-title">
-        <div className="hero-art" aria-hidden="true">
-          <img
-            src={`${base}/images/spider-hero.png`}
-            alt=""
-            width="734"
-            height="692"
             fetchPriority="high"
           />
         </div>
@@ -162,8 +155,22 @@ export default function PortfolioExperience() {
             <a className="button primary" href="#projects">
               Explore my work <ArrowUpRight size={18} />
             </a>
-            <a className="text-link" href={github}>
-              <Github size={18} /> GitHub
+            <a
+              className="text-link"
+              href={github}
+              aria-label="Bharath on GitHub"
+              title="GitHub"
+            >
+              <Github size={18} /> <span className="social-label">GitHub</span>
+            </a>
+            <a
+              className="text-link"
+              href={linkedin}
+              aria-label="Bharath on LinkedIn"
+              title="LinkedIn"
+            >
+              <Linkedin size={18} />{" "}
+              <span className="social-label">LinkedIn</span>
             </a>
           </div>
           <a className="scroll-link" href="#about">
@@ -449,6 +456,9 @@ export default function PortfolioExperience() {
         <div>
           <a href={github} aria-label="Bharath on GitHub">
             <Github size={20} />
+          </a>
+          <a href={linkedin} aria-label="Bharath on LinkedIn">
+            <Linkedin size={20} />
           </a>
           <a href="mailto:levictf24@gmail.com" aria-label="Email Bharath">
             <Mail size={20} />
